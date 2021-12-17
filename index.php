@@ -15,6 +15,11 @@
   $users[] = array("fullname" => "Max Dmitriev", "age" => 21);
   $users[] = array("fullname" => "Ilia Mihov", "age" => 21);
 
+  $reqContentType;
+  if (isset($_SERVER['CONTENT_TYPE'])) {
+    $reqContentType = strtolower(trim($_SERVER['CONTENT_TYPE']));
+  }
+
   $reqMethod = $_SERVER['REQUEST_METHOD'];
   # Request with query params
   $reqUrl = $_SERVER['REQUEST_URI'];
@@ -32,8 +37,6 @@
         $userId = intval(substr($reqRes, strlen('/api/users/')));
 
         if (!+$userId) {
-          # var_dump(httpException("error"));
-
           httpException("'userId' should be number")['end']();
         }
 
@@ -61,10 +64,29 @@
       break;
 
     case 'POST':
-      $body = file_get_contents("php://input");
+      $body = array();
+      $data = array();
 
+      if ($reqContentType == 'application/json') {
+        $body = file_get_contents("php://input");
+        $data = json_decode($body, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          httpException("Error parsing json", 400)['end']();
+        }
+      } else if ($reqContentType == 'application/x-www-form-urlencoded') {
+        httpException("Form content type", 200)['end']();
+      } else {
+        httpException("Unsupported Content-Type", 400)['end']();
+      }
+      
       if ($reqRes === '/api/users') {
-        $users[] = $body;
+        $users[] = $data;
+
+        echo json_encode(array(
+          "users" => $users
+        ));
+        exit;
       } else {
         httpException("Route not found", 404)['end']();
       }
