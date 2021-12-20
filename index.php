@@ -9,13 +9,14 @@
       "statusCode" => 500
     ));
 	 	exit;
-	}
+  }
 
-  $users = [];
-  $users[] = array("fullname" => "Max Dmitriev", "age" => 21);
-  $users[] = array("fullname" => "Ilia Mihov", "age" => 21);
+  @include_once "users.service.php";
+
+  $usersService = new UsersService();
 
   $reqContentType;
+  
   if (isset($_SERVER['CONTENT_TYPE'])) {
     $reqContentType = strtolower(trim($_SERVER['CONTENT_TYPE']));
   }
@@ -40,17 +41,21 @@
           httpException("'userId' should be number")['end']();
         }
 
-        if ($userId < 0 || $userId >= count($users)) {
+        $user = $usersService->getUserById($userId);
+
+        if (is_null($user)) {
           httpException("User not found", 404)['end']();
         }
 
         $response = array(
-          "user" => $users[$userId]
+          "user" => $user
         );
 
         echo json_encode($response);
         exit;
       } elseif ($reqRes === '/api/users') {
+        $users = $usersService->getUsers();
+
         $response = array(
           "users" => $users
         );
@@ -67,6 +72,7 @@
       $body = array();
       $data = array();
 
+      // Parse request body
       if ($reqContentType == 'application/json') {
         $body = file_get_contents("php://input");
         $data = json_decode($body, true);
@@ -75,15 +81,20 @@
           httpException("Error parsing json", 400)['end']();
         }
       } else if ($reqContentType == 'application/x-www-form-urlencoded') {
-        httpException("Form content type", 200)['end']();
+        httpException("Form content type not supported yet", 400)['end']();
       } else {
         httpException("Unsupported Content-Type", 400)['end']();
       }
       
       if ($reqRes === '/api/users') {
-        $users[] = $data;
+        $result = $usersService->addUser($data);
+
+        if (!$result) {
+          httpException("Failed to create user", 400)['end']();
+        }
 
         echo json_encode(array(
+          "user" => $user,
           "users" => $users
         ));
         exit;
