@@ -23,9 +23,9 @@ class UsersService {
     return $this->users[$id];
   }
 
-  function addUser($data)
+  function createUser($user)
   {
-    $this->users[] = $data;
+    $this->users[] = $user;
 
     return true;
   }

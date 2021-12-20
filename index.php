@@ -11,9 +11,26 @@
 	 	exit;
   }
 
-  @include_once "users.service.php";
+  unset($dbConfig);
+  @include "db.config.php";
+  if (empty($dbConfig)) {
+    httpException("DB error", 500)['end']();
+  }
 
-  $usersService = new UsersService();
+  try {
+    $DB = new PDO(
+      "{$dbConfig['type']}:host={$dbConfig['host']};port={$dbConfig['port']};dbname={$dbConfig['name']}",
+      $dbConfig['user'],
+      $dbConfig['pass']
+    );
+    $DB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  } catch (Exception $ex) {
+    httpException($ex->getMessage(), 500)['end']();
+  }
+
+  @include_once "users.controller.php";
+
+  $usersController = new UsersController();
 
   $reqContentType;
   
@@ -35,33 +52,9 @@
   switch($reqMethod) {
     case 'GET':
       if (strpos($reqRes, '/api/users/') === 0) {
-        $userId = intval(substr($reqRes, strlen('/api/users/')));
-
-        if (!+$userId) {
-          httpException("'userId' should be number")['end']();
-        }
-
-        $user = $usersService->getUserById($userId);
-
-        if (is_null($user)) {
-          httpException("User not found", 404)['end']();
-        }
-
-        $response = array(
-          "user" => $user
-        );
-
-        echo json_encode($response);
-        exit;
+        $usersController->getUserById($reqRes);
       } elseif ($reqRes === '/api/users') {
-        $users = $usersService->getUsers();
-
-        $response = array(
-          "users" => $users
-        );
-
-        echo json_encode($response);
-        exit;
+        $usersController->getUsers();
       } else {
         httpException("Route not found", 404)['end']();
       }
@@ -87,17 +80,7 @@
       }
       
       if ($reqRes === '/api/users') {
-        $result = $usersService->addUser($data);
-
-        if (!$result) {
-          httpException("Failed to create user", 400)['end']();
-        }
-
-        echo json_encode(array(
-          "user" => $user,
-          "users" => $users
-        ));
-        exit;
+        $usersController->createUser($data);
       } else {
         httpException("Route not found", 404)['end']();
       }
