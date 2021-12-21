@@ -1,19 +1,31 @@
 <?php
 @include_once "./utils/httpException.php";
+@include_once "./utils/request.php";
 @include_once "./users/users.controller.php";
 
 class AppController {
   private $con;
+  # Request object
+  private $_req;
+  # Parsed request array
+  private $req;
   private $dbConfig;
   private $usersController;
-  private $reqContentType, $reqMethod, $reqUrl, $reqRes;
 
   function __construct($dbConfig) {
-    $this->dbConfig = $dbConfig;
-
+    # Setup headers and db
     $this->setHeaders();
-    $this->parseRequest();
+    $this->dbConfig = $dbConfig;
     $this->connectToDb();
+
+    # Initilize controllers
+    $this->usersController = new UsersController();
+
+    # Parse request
+    $this->_req = new Request($_SERVER);
+    $this->req = $this->_req->getRequest();
+
+    # Routing
     $this->router();
   }
 
@@ -34,52 +46,12 @@ class AppController {
     }
   }
 
-  private function parseRequest() {
-    $this->reqMethod = $_SERVER['REQUEST_METHOD'];
-    $this->usersController = new UsersController();
-    # Request url with query params
-    $this->reqUrl = $_SERVER['REQUEST_URI'];
-    
-    # Request url without query params
-    # When we have query params in URL they won't be shown here
-    $this->reqRes = '/';
-    if (isset($_SERVER['REDIRECT_URL'])) {
-      $this->reqRes = $_SERVER['REDIRECT_URL'];
-    }
-
-    if (isset($_SERVER['CONTENT_TYPE'])) {
-      $this->reqContentType = strtolower(trim($_SERVER['CONTENT_TYPE']));
-    }
-  }
-
-  private function parseRequestBody() {
-    # Parsed body
-    $body = array();
-    # Parsed json from body
-    $data = array();
-
-    if ($this->reqContentType == 'application/json') {
-      $body = file_get_contents("php://input");
-      $data = json_decode($body, true);
-
-      if (json_last_error() !== JSON_ERROR_NONE) {
-        httpException("Error parsing json", 400)['end']();
-      }
-    } else if ($reqContentType == 'application/x-www-form-urlencoded') {
-      httpException("Form content type not supported yet", 400)['end']();
-    } else {
-      httpException("Unsupported Content-Type", 400)['end']();
-    }
-
-    return array("body" => $body, "data" => $data);
-  }
-
   private function router() {
-    switch($this->reqMethod) {
+    switch($this->req['method']) {
       case 'GET':
-        if (strpos($this->reqRes, '/api/users/') === 0) {
-          $this->usersController->getUserById($this->reqRes);
-        } elseif ($this->reqRes === '/api/users') {
+        if (strpos($this->req['resource'], '/api/users/') === 0) {
+          $this->usersController->getUserById($this->req);
+        } elseif ($this->req['resource'] === '/api/users') {
           $this->usersController->getUsers();
         } else {
           httpException("Route not found", 404)['end']();
@@ -88,9 +60,9 @@ class AppController {
         break;
 
       case 'POST':
-        [$body, $data] = parseRequestBody();
+        [$body, $data] = $this->_req->parseBody();
 
-        if ($this->reqRes === '/api/users') {
+        if ($this->req['resource'] === '/api/users') {
           $this->usersController->createUser($data);
         } else {
           httpException("Route not found", 404)['end']();

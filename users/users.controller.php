@@ -20,9 +20,9 @@ class UsersController {
     exit;
   }
 
-  function getUserById($reqRes) {
+  function getUserById($req) {
     # Parse user id from url
-    $userId = intval(substr($reqRes, strlen('/api/users/')));
+    $userId = intval(substr($req['resource'], strlen('/api/users/')));
 
     if (!+$userId) {
       httpException("'userId' should be number")['end']();
