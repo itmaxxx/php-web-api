@@ -1,9 +1,5 @@
 <?php
 	
-function printHello($name = null) {
-	echo "Hello $name";
-}
-
 function httpException($message, $code = 400) {
   header('Content-Type: application/json');
   http_response_code($code);
