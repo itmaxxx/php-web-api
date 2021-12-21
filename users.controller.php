@@ -20,6 +20,7 @@ class UsersController {
   }
 
   function getUserById($reqRes) {
+    # Parse user id from url
     $userId = intval(substr($reqRes, strlen('/api/users/')));
 
     if (!+$userId) {

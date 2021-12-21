@@ -1,19 +1,19 @@
 <?php
 	
-	function printHello($name = null) {
-		echo "Hello $name";
-  }
+function printHello($name = null) {
+	echo "Hello $name";
+}
 
-  function httpException($message, $code = 400) {
-    header('Content-Type: application/json');
-    http_response_code($code);
+function httpException($message, $code = 400) {
+  header('Content-Type: application/json');
+  http_response_code($code);
 
-    echo json_encode(array(
-      "message" => $message,
-      "statusCode" => $code
-    ));
+  echo json_encode(array(
+    "message" => $message,
+    "statusCode" => $code
+  ));
 
-    return array(
-      "end" => function() { exit; }
-    );
-  }
+  return array(
+    "end" => function() { exit; }
+  );
+}
