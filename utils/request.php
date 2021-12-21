@@ -1,4 +1,7 @@
 <?php
+
+@include_once "./httpException.php";
+
 class Request {
   private $contentType, $method, $url, $resource;
 
