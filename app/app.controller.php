@@ -1,6 +1,6 @@
 <?php
-@include_once "funcs.php";
-@include_once "users.controller.php";
+@include_once "./utils/httpException.php";
+@include_once "./users/users.controller.php";
 
 class AppController {
   private $con;

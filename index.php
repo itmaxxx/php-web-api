@@ -1,6 +1,8 @@
 <?php
-@include_once "funcs.php";
-	
+@include_once "./utils/httpException.php";
+@include_once "./app/app.controller.php";
+
+# Check if function loaded successfully, or throw error
 if (!function_exists("httpException")) {
   echo json_encode(array(
     "message" => "Runtime error",
@@ -9,13 +11,12 @@ if (!function_exists("httpException")) {
 	exit;
 }
 
+# Safely load config
 unset($dbConfig);
-@include "db.config.php";
+@include "./db/db.config.php";
 if (empty($dbConfig)) {
   httpException("Config load error", 500)['end']();
 }
-
-@include_once "app.controller.php";
 
 # Setup app
 $app = new AppController($dbConfig);

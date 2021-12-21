@@ -1,4 +1,5 @@
 <?php
+@include_once("./utils/httpException.php");
 @include_once("users.service.php");
 
 class UsersController {
