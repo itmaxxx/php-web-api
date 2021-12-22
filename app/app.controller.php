@@ -3,6 +3,7 @@
 @include_once "./utils/httpException.php";
 @include_once "./utils/request.php";
 @include_once "./users/users.controller.php";
+@include_once "./db/db.controller.php";
 
 class AppController {
   # Connection
@@ -12,6 +13,7 @@ class AppController {
   # Parsed request array
   private $req;
   private $dbConfig;
+  private $dbController;
   private $usersController;
 
   function __construct($dbConfig) {
@@ -20,7 +22,9 @@ class AppController {
     $this->dbConfig = $dbConfig;
     $this->connectToDb();
 
+
     # Initilize controllers
+    $this->dbController = new DbController($this->conn);
     $this->usersController = new UsersController($this->conn);
 
     # Parse request
