@@ -10,21 +10,21 @@ class AppController {
   private $conn;
   # Request object
   private $_req;
-  # Parsed request array
+  # Parsed request
   private $req;
-  private $dbConfig;
+  # Controllers
   private $dbController;
   private $usersController;
 
   function __construct($dbConfig) {
     # Setup headers and db
     $this->setHeaders();
-    $this->dbConfig = $dbConfig;
-    $this->connectToDb();
 
+    # Setup db
+    $this->dbController = new DbController($dbConfig);
+    $this->conn = $this->dbController->getConnection();
 
     # Initilize controllers
-    $this->dbController = new DbController($this->conn);
     $this->usersController = new UsersController($this->conn);
 
     # Parse request
@@ -37,19 +37,6 @@ class AppController {
 
   private function setHeaders() {
     header('Content-Type: application/json');
-  }
-
-  private function connectToDb() {
-    try {
-      $this->conn = new PDO(
-        "{$this->dbConfig['type']}:host={$this->dbConfig['host']};port={$this->dbConfig['port']};dbname={$this->dbConfig['name']}",
-        $this->dbConfig['user'],
-        $this->dbConfig['pass']
-      );
-      $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (Exception $ex) {
-      httpException($ex->getMessage(), 500)['end']();
-    }
   }
 
   private function router() {

@@ -3,16 +3,33 @@
 class DbController {
   private $conn;
   
-  public function __construct($conn) {
-    $this->conn = $conn;
+  public function __construct($dbConfig) {
+    $this->connectToDb($dbConfig);
 
-    $this->drop(['Users']);
+    # $this->drop(['Users']);
 
     $this->initialize();
 
-    $this->seed('Users', ["id", "name", "age"], [
-      [1, "Max Dmitriev", 21]
-    ]);
+    # $this->seed('Users', ["id", "name", "age"], [
+    #   [1, "Max Dmitriev", 21]
+    # ]);
+  }
+
+  public function getConnection() {
+    return $this->conn;
+  }
+
+  private function connectToDb(array $dbConfig) {
+    try {
+      $this->conn = new PDO(
+        "{$dbConfig['type']}:host={$dbConfig['host']};port={$dbConfig['port']};dbname={$dbConfig['name']}",
+        $dbConfig['user'],
+        $dbConfig['pass']
+      );
+      $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (Exception $ex) {
+      httpException($ex->getMessage(), 500)['end']();
+    }
   }
 
   public function seed(string $table, array $fields, array $fixtures) {

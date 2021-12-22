@@ -50,8 +50,8 @@ class UsersController {
     }
 
     $response = array(
-      "user" => $result,
-      "users" => $users
+      "message" => "User created",
+      "user" => $result
     );
 
     jsonResponse($response)['end']();
