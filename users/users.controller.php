@@ -1,12 +1,14 @@
 <?php
+
 @include_once("./utils/httpException.php");
+@include_once "./utils/jsonResponse.php";
 @include_once("users.service.php");
 
 class UsersController {
   private $usersService;
 
-  function __construct() {
-    $this->usersService = new UsersService();
+  function __construct($conn) {
+    $this->usersService = new UsersService($conn);
   }
 
   function getUsers() {
@@ -16,8 +18,7 @@ class UsersController {
       "users" => $users
     );
 
-    echo json_encode($response);
-    exit;
+    jsonResponse($response)['end']();
   }
 
   function getUserById($req) {
@@ -38,8 +39,7 @@ class UsersController {
       "user" => $user
     );
 
-    echo json_encode($response);
-    exit;
+    jsonResponse($response)['end']();
   }
 
   function createUser($userDto) {
@@ -49,10 +49,11 @@ class UsersController {
       httpException("Failed to create user", 400)['end']();
     }
 
-    echo json_encode(array(
+    $response = array(
       "user" => $result,
       "users" => $users
-    ));
-    exit;
+    );
+
+    jsonResponse($response)['end']();
   }
 }

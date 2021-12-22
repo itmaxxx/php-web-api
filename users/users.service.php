@@ -1,17 +1,25 @@
 <?php
-class UsersService {
-  private $users = [];
 
-  function __construct()
+class UsersService {
+  private $conn;
+
+  function __construct($conn)
   {
-    $this->users[] = array("fullname" => "Max Dmitriev", "age" => 21);
-    $this->users[] = array("fullname" => "Ilia Mihov", "age" => 21);
-    $this->users[] = array("fullname" => "Matvey Gorelik", "age" => 20);
+    $this->conn = $conn;
   }
 
   function getUsers()
   {
-    return $this->users;
+    $sql = "SELECT * FROM Users";
+    $result = $this->conn->query($sql);
+
+    $users = [];
+
+    while ($user = $result->fetch()) {
+      $users[] = $user;
+    }
+
+    return $users;
   }
 
   function getUserById($id)
@@ -25,6 +33,11 @@ class UsersService {
 
   function createUser($user)
   {
+    var_dump($user);
+
+    # $sql = "INSERT INTO Users (name) VALUES ('Max')";
+    # $conn->exec($sql);
+
     $this->users[] = $user;
 
     return true;

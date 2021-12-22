@@ -1,4 +1,5 @@
 <?php
+
 $dbConfig = [
   "type" => "mysql",
   "host" => "localhost",

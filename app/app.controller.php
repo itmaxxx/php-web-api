@@ -1,10 +1,12 @@
 <?php
+
 @include_once "./utils/httpException.php";
 @include_once "./utils/request.php";
 @include_once "./users/users.controller.php";
 
 class AppController {
-  private $con;
+  # Connection
+  private $conn;
   # Request object
   private $_req;
   # Parsed request array
@@ -19,7 +21,7 @@ class AppController {
     $this->connectToDb();
 
     # Initilize controllers
-    $this->usersController = new UsersController();
+    $this->usersController = new UsersController($this->conn);
 
     # Parse request
     $this->_req = new Request($_SERVER);
