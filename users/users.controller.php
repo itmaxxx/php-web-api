@@ -25,9 +25,9 @@ class UsersController {
     # Parse user id from url
     $userId = intval(substr($req['resource'], strlen('/api/users/')));
 
-    if (!+$userId) {
-      httpException("'userId' should be number")['end']();
-    }
+    # if (!+$userId) {
+    #   httpException("'userId' should be number")['end']();
+    # }
 
     $user = $this->usersService->getUserById($userId);
 

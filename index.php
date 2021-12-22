@@ -3,6 +3,9 @@
 @include_once "./utils/httpException.php";
 @include_once "./app/app.controller.php";
 
+# Disable errors, should be false in production
+# error_reporting(false);
+
 # Check if function loaded successfully, or throw error
 if (!function_exists("httpException")) {
   echo json_encode(array(

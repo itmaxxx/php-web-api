@@ -15,7 +15,7 @@ class UsersService {
 
     $users = [];
 
-    while ($user = $result->fetch()) {
+    while ($user = $result->fetch(PDO::FETCH_ASSOC)) {
       $users[] = $user;
     }
 
@@ -24,11 +24,16 @@ class UsersService {
 
   function getUserById($id)
   {
-    if ($id < 0 || $id >= count($this->users)) {
+    $sql = "SELECT * FROM Users WHERE id=:userid";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindValue(":userid", $id);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+      return $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
       return null;
     }
-
-    return $this->users[$id];
   }
 
   function createUser($user)
