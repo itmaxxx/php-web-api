@@ -42,12 +42,17 @@ class AppController {
   private function router() {
     switch($this->req['method']) {
       case 'GET':
+        header('Content-Type: text/html');
+
         if (strpos($this->req['resource'], '/api/users/') === 0) {
           $this->usersController->getUserById($this->req);
         } elseif ($this->req['resource'] === '/api/users') {
           $this->usersController->getUsers();
+        } elseif ($this->req['resource'] === '/test') {
+          include_once './tests/users-e2e.php';
         } else {
           httpException("Route not found", 404)['end']();
+          logMessage("Route not found $req");
         }
 
         break;
