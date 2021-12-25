@@ -1,18 +1,20 @@
 <?php
 
+@include_once("./fixtures/users.php");
+
 class DbController {
   private $conn;
   
   public function __construct($dbConfig) {
     $this->connectToDb($dbConfig);
 
-    # $this->drop(['Users']);
+    $this->drop(['Users']);
 
     $this->initialize();
 
-    # $this->seed('Users', ["id", "name", "age"], [
-    #   [1, "Max Dmitriev", 21]
-    # ]);
+    # Include $usersFixtures from global scope here
+    global $usersFixtures;
+    $this->seed('Users', ["id", "name", "age"], $usersFixtures);
   }
 
   public function getConnection() {

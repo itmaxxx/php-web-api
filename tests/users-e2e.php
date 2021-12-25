@@ -56,10 +56,41 @@ function assertNotStrict($v1, $v2) {
   }
 }
 
+function assertObject($obj1, $obj2) {
+  if (json_encode($obj1) === json_encode($obj2)) {
+    return true;
+  } else {
+    throw new Exception("assertObject() $v1 !== $v2");
+  }
+}
+
+function request($url) {
+  $req = curl_init();
+
+  curl_setopt($req, CURLOPT_URL, $url);
+  curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
+
+  $response = curl_exec($req);
+  $responseInfo = curl_getinfo($req);
+
+  curl_close($req);
+
+  return ["data" => $response, "info" => $responseInfo];
+}
+
 describe("[GET] /api/users", function() {
   it("should get users list", function() {
+    $response = request("http://localhost/api/users");
+    $json = json_decode($response['data']);
+
+    var_dump($json);
+
+    assertStrict($response['info']['http_code'], 200);
+    # assertStrict($json['data']['users'], $usersFixtures);
+    assertObject($json['data']['users'], $usersFixtures);
+
     assertStrict(123, 123);
-    assertStrict("123", 123);
+    assertNotStrict("123", 123);
   });
 });
 
