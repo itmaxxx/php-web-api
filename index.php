@@ -25,11 +25,3 @@ if (empty($dbConfig)) {
 # Setup app
 $app = new AppController($dbConfig);
 
-exit;
-
-try {
-  } catch (Exception $ex) {
-  httpException($ex->getMessage(), 500)['end']();
-}
-
-

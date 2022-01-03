@@ -34,13 +34,19 @@ class DbController {
     }
   }
 
-  public function seed(string $table, array $fields, array $fixtures) {
+  /**
+   *  Seeds data from array in specified table and columns
+   *  @param {string}   $table    Table name where we want to seed data
+   *  @param {string[]} $columns  Array of fields names we want to insert
+   *  @param {object[]} $fixtures Array of fixtures with fields from $fields in same order
+   */
+  public function seed(string $table, array $columns, array $fixtures) {
     try {
-      $fieldsString = implode(",", $fields);
-      $valuesString = implode(",", array_fill(0, count($fields), "?"));
+      $columnsString = implode(",", $columns);
+      $valuesString = implode(",", array_fill(0, count($columns), "?"));
 
-      foreach ($fixtures as $fixture) {
-        $sql = "INSERT INTO $table ($fieldsString) VALUES ($valuesString)";
+      foreach ($columns as $column) {
+        $sql = "INSERT INTO $table ($columnsString) VALUES ($valuesString)";
         $this->conn->prepare($sql)->execute($fixture);
       }
     } catch (Exception $ex) {
@@ -48,6 +54,10 @@ class DbController {
     }
   }
 
+  /**
+   *  Drop specified table in DB
+   *  @param {string[]} $tables Array of tables names
+   */
   private function drop($tables) {
     try {
       foreach ($tables as $table) {
@@ -59,6 +69,9 @@ class DbController {
     }
   }
 
+  /**
+   *  Create all tables with hardcoded sql script
+   */
   private function initialize() {
     try {
       # Create Users table

@@ -60,7 +60,7 @@ function assertObject($obj1, $obj2) {
   if (json_encode($obj1) === json_encode($obj2)) {
     return true;
   } else {
-    throw new Exception("assertObject() $v1 !== $v2");
+    throw new Exception("assertObject() " . json_encode($obj1) . " !== " . json_encode($obj2));
   }
 }
 
@@ -80,14 +80,16 @@ function request($url) {
 
 describe("[GET] /api/users", function() {
   it("should get users list", function() {
+    global $usersFixtures;
+
     $response = request("http://localhost/api/users");
     $json = json_decode($response['data']);
 
-    var_dump($json);
+    var_dump($json->data->users);
+    var_dump($usersFixtures);
 
     assertStrict($response['info']['http_code'], 200);
-    # assertStrict($json['data']['users'], $usersFixtures);
-    assertObject($json['data']['users'], $usersFixtures);
+    assertObject($json->data->users, $usersFixtures);
 
     assertStrict(123, 123);
     assertNotStrict("123", 123);
