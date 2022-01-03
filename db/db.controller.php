@@ -45,7 +45,7 @@ class DbController {
       $columnsString = implode(",", $columns);
       $valuesString = implode(",", array_fill(0, count($columns), "?"));
 
-      foreach ($columns as $column) {
+      foreach ($fixtures as $fixture) {
         $sql = "INSERT INTO $table ($columnsString) VALUES ($valuesString)";
         $this->conn->prepare($sql)->execute($fixture);
       }
