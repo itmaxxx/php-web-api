@@ -51,7 +51,7 @@ class AppController {
         } elseif ($this->req['resource'] === '/test') {
           include_once './tests/users-e2e.php';
         } else {
-          httpException("Route not found", 404)['end']();
+          httpException("Route not found [" . $this->req['method'] . "] " . $this->req['resource'], 404)['end']();
           logMessage("Route not found $req");
         }
 
