@@ -3,8 +3,8 @@
 $dbConfig = [
   "type" => "mysql",
   "host" => "localhost",
-  "port" => 3306,
+  "port" => 3309,
   "user" => "root",
   "pass" => "root",
-  "name" => "db_test"
+  "name" => "web_chat"
 ];
